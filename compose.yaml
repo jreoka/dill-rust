@@ -1,0 +1,37 @@
+name: dill-rust
+
+services:
+  rust-server:
+    build: .
+    container_name: dill-rust
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - "28015:28015/tcp"
+      - "28015:28015/udp"
+      - "28017:28017/tcp"
+      - "28082:28082/tcp"
+    volumes:
+      - ./data:/home/rust/server/server/rust
+    command:
+      - +server.port
+      - "28015"
+      - +server.identity
+      - rust
+      - +server.maxplayers
+      - "200"
+      - +server.hostname
+      - "dill.moe"
+      - +server.description
+      - "Dill Rust - Monthly Wipe"
+      - -queryport
+      - "28017"
+      - +app.port
+      - "28082"
+      - +ownerid
+      - "76561198097993873"
+      - +server.tags
+      - vanilla,monthly,pvp
+      - +server.worldsize
+      - "4500"
