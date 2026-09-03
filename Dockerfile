@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV USER=rust
 ENV HOME=/home/rust
 ENV SERVER_DIR=/home/rust/server
+ENV LD_LIBRARY_PATH=/home/rust/server:/home/rust/server/RustDedicated_Data/Plugins/x86_64
 
 RUN dpkg --add-architecture i386 && \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -25,10 +26,12 @@ RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 WORKDIR ${HOME}
 
 RUN steamcmd +force_install_dir ${SERVER_DIR} +login anonymous +app_update 258550 validate +quit && \
+    mkdir -p ${HOME}/.steam/sdk64 ${HOME}/.steam/sdk32 && \
+    ln -sf ${SERVER_DIR}/steamclient.so ${HOME}/.steam/sdk64/steamclient.so && \
+    ln -sf ${SERVER_DIR}/steamclient.so ${HOME}/.steam/sdk32/steamclient.so && \
     chown -R ${USER}:${USER} ${HOME} ${SERVER_DIR}
 
 VOLUME ${SERVER_DIR}/server/rust
 EXPOSE 28015/tcp 28015/udp 28017/tcp 28082/tcp
 
-# Stay as root - entrypoint will chown ./data then gosu to rust
 ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
