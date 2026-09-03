@@ -1,13 +1,20 @@
 #!/bin/bash
 set -e
 
+# If we're root, fix ownership of the mounted volume then drop to rust user
+if [ "$(id -u)" = "0" ]; then
+  mkdir -p "$SERVER_DIR/server/rust"
+  chown -R rust:rust "$SERVER_DIR" /home/rust/Steam 2>/dev/null || true
+  chown -R rust:rust "$SERVER_DIR/server/rust" 2>/dev/null || true
+  exec gosu rust "$0" "$@"
+fi
+
 echo "Checking for Rust update..."
 steamcmd +force_install_dir "$SERVER_DIR" +login anonymous +app_update 258550 validate +quit
 
 IDENTITY_DIR="$SERVER_DIR/server/rust"
 SEED_FILE="$IDENTITY_DIR/current_seed.txt"
 
-# Random seed on first launch / wipe if +server.seed not set in compose.yaml
 if [[ "$*" != *"+server.seed"* ]]; then
   if [ -f "$SEED_FILE" ]; then
     SEED=$(cat "$SEED_FILE")

@@ -7,12 +7,11 @@ ENV SERVER_DIR=/home/rust/server
 
 RUN dpkg --add-architecture i386 && \
     apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl lib32gcc-s1 lib32stdc++6 libc6-i386 tini dos2unix \
+    ca-certificates curl lib32gcc-s1 lib32stdc++6 libc6-i386 tini dos2unix gosu \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -s /bin/bash ${USER}
 
-# Install steamcmd - with wrapper, not symlink
 RUN mkdir -p /opt/steamcmd && \
     curl -sSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar -xz -C /opt/steamcmd && \
     chmod +x /opt/steamcmd/steamcmd.sh && \
@@ -21,16 +20,15 @@ RUN mkdir -p /opt/steamcmd && \
     chown -R ${USER}:${USER} /opt/steamcmd ${HOME}
 
 COPY entrypoint.sh /entrypoint.sh
-RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh && chown ${USER}:${USER} /entrypoint.sh
+RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
-USER ${USER}
 WORKDIR ${HOME}
 
-# This will now work - it will download linux32/steamcmd on first run
-RUN steamcmd +force_install_dir ${SERVER_DIR} +login anonymous +app_update 258550 validate +quit
+RUN steamcmd +force_install_dir ${SERVER_DIR} +login anonymous +app_update 258550 validate +quit && \
+    chown -R ${USER}:${USER} ${HOME} ${SERVER_DIR}
 
 VOLUME ${SERVER_DIR}/server/rust
-
 EXPOSE 28015/tcp 28015/udp 28017/tcp 28082/tcp
 
+# Stay as root - entrypoint will chown ./data then gosu to rust
 ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
