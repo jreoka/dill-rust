@@ -12,20 +12,21 @@ RUN dpkg --add-architecture i386 && \
 
 RUN useradd -m -s /bin/bash ${USER}
 
-# Install steamcmd
+# Install steamcmd - with wrapper, not symlink
 RUN mkdir -p /opt/steamcmd && \
     curl -sSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar -xz -C /opt/steamcmd && \
-    ln -s /opt/steamcmd/steamcmd.sh /usr/local/bin/steamcmd && \
+    chmod +x /opt/steamcmd/steamcmd.sh && \
+    printf '#!/bin/sh\nexec /opt/steamcmd/steamcmd.sh "$@"\n' > /usr/local/bin/steamcmd && \
+    chmod +x /usr/local/bin/steamcmd && \
     chown -R ${USER}:${USER} /opt/steamcmd ${HOME}
 
-# Copy and force Unix line endings (fixes Windows editing)
 COPY entrypoint.sh /entrypoint.sh
 RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh && chown ${USER}:${USER} /entrypoint.sh
 
 USER ${USER}
 WORKDIR ${HOME}
 
-# Initial official server install
+# This will now work - it will download linux32/steamcmd on first run
 RUN steamcmd +force_install_dir ${SERVER_DIR} +login anonymous +app_update 258550 validate +quit
 
 VOLUME ${SERVER_DIR}/server/rust
