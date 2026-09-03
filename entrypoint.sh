@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# If we're root, fix ownership of the mounted volume then drop to rust user
 if [ "$(id -u)" = "0" ]; then
   mkdir -p "$SERVER_DIR/server/rust"
   chown -R rust:rust "$SERVER_DIR" /home/rust/Steam 2>/dev/null || true
@@ -28,5 +27,8 @@ if [[ "$*" != *"+server.seed"* ]]; then
   set -- "$@" +server.seed "$SEED"
 fi
 
+# Rust MUST run from its own directory
+cd "$SERVER_DIR"
+
 echo "Starting RustDedicated with args: $@"
-exec "$SERVER_DIR/RustDedicated" -batchmode -nographics "$@"
+exec ./RustDedicated -batchmode -nographics "$@"
