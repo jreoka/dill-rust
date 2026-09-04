@@ -11,6 +11,7 @@ services:
       - "28015:28015/tcp"
       - "28015:28015/udp"
       - "28017:28017/tcp"
+      - "28017:28017/udp"
       - "28082:28082/tcp"
     volumes:
       - ./data:/home/rust/server/server/rust
