@@ -18,7 +18,7 @@ services:
       - +server.port
       - "28015"
       - +server.identity
-      - rust
+      - "rust"
       - +server.maxplayers
       - "200"
       - +server.hostname
@@ -32,6 +32,6 @@ services:
       - +ownerid
       - "76561198097993873"
       - +server.tags
-      - vanilla,monthly,pvp
+      - "vanilla,monthly"
       - +server.worldsize
       - "4500"
