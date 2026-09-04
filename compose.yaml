@@ -22,7 +22,7 @@ services:
       - +server.maxplayers
       - "200"
       - +server.hostname
-      - "dill.moe"
+      - "rust.dill.moe"
       - +server.description
       - "Dill Rust - Monthly Wipe"
       - -queryport
