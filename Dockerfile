@@ -32,6 +32,5 @@ RUN steamcmd +force_install_dir ${SERVER_DIR} +login anonymous +app_update 25855
     chown -R ${USER}:${USER} ${HOME} ${SERVER_DIR}
 
 VOLUME ${SERVER_DIR}/server/rust
-EXPOSE 28015/tcp 28015/udp 28017/tcp 28082/tcp
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
