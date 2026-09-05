@@ -21,7 +21,7 @@ services:
       - +server.identity
       - "rust"
       - +server.maxplayers
-      - "200"
+      - "350"
       - +server.hostname
       - "dill.moe"
       - +server.description
